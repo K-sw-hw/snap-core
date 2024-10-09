@@ -3,7 +3,7 @@
 import cv2
 import mediapipe as mp
 import math
-
+import data
 
 #Inizializza modulo di riconoscimento della mano
 mp_hands = mp.solutions.hands
@@ -69,7 +69,10 @@ def CalculateDistance(frame, wrist):
     distance_from_camera = (1 - wrist.y) * frame_height #Calcola la distanza in pixel
     distance_text = f"Distanza: {int(distance_from_camera)} px"
 
-            #Mostra scritta
+    #Aggiorna dato
+    data.distance = int(distance_from_camera)
+
+    #Mostra scritta
     cv2.putText(frame, distance_text, (10, 60), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 255, 0), 2)
 
 def CalculateCenter(mp_hands, mp_drawing, frame, hand_landmarks, wrist, index_finger_tip, middle_finger_tip, ring_finger_tip, pinky_tip):
@@ -82,6 +85,9 @@ def CalculateCenter(mp_hands, mp_drawing, frame, hand_landmarks, wrist, index_fi
 
     palm_center_x = int((wrist.x + index_finger_tip.x + middle_finger_tip.x + ring_finger_tip.x + pinky_tip.x) / 5 * frame.shape[1])
     palm_center_y = int((wrist.y + index_finger_tip.y + middle_finger_tip.y + ring_finger_tip.y + pinky_tip.y) / 5 * frame.shape[0])
+
+    #Aggiorna dato
+    data.palm_center = (palm_center_x, palm_center_y)
 
             #Disegna pallina
     cv2.circle(frame, (palm_center_x, palm_center_y), 10, (0, 0, 255), -1)
@@ -124,6 +130,10 @@ while cap.isOpened():
             CalculateDistance(frame, wrist)
 
             CalculateCenter(mp_hands, mp_drawing, frame, hand_landmarks, wrist, index_finger_tip, middle_finger_tip, ring_finger_tip, pinky_tip)
+
+            #Aggiorna dato
+            data.gesture = gesture
+
 
             #Mostra scritta
             cv2.putText(frame, gesture, (10, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 255, 0), 3)
