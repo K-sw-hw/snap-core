@@ -4,10 +4,14 @@ import cv2
 import mediapipe as mp
 import math
 import data
+import serial
 
 #Inizializza modulo di riconoscimento della mano
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands()
+
+#Inizializza Arduino
+arduino = serial.Serial('COM3', 9600)
 
 #Inizializza output
 mp_drawing = mp.solutions.drawing_utils
@@ -126,17 +130,18 @@ while cap.isOpened():
             """Richiama subroutine"""
 
             gesture = GestureRecognizer(thumb_tip, index_finger_tip, ring_finger_tip)
-
             CalculateDistance(frame, wrist)
-
             CalculateCenter(mp_hands, mp_drawing, frame, hand_landmarks, wrist, index_finger_tip, middle_finger_tip, ring_finger_tip, pinky_tip)
 
             #Aggiorna dato
             data.gesture = gesture
-
-
             #Mostra scritta
             cv2.putText(frame, gesture, (10, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 255, 0), 3)
+
+            """
+            Manda istruzioni ad Arduino
+            """
+            arduino.write(f"{gesture}\n".encode())
 
 
 
