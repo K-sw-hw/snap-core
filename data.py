@@ -4,3 +4,8 @@
 gesture = ""
 distance = 0
 palm_center = (0, 0)
+
+
+
+
+
