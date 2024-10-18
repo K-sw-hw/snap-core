@@ -12,9 +12,9 @@ options = {
 }
 
 setup(
-    name = "Riconoscimento Gestuale _ Fetahi",
+    name = "Riconoscimento Gestuale _ Fetahi v0.2",
     options = options,
-    version = "0.1",
+    version = "0.2",
     description = 'Programma realizzato per gestire un robot usando la propria mano',
     executables = executables
 )
