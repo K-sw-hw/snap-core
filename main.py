@@ -10,6 +10,12 @@ import serial
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+from pyedo import edo
+
+myedo = edo('192.168.12.1')
+myedo.stepByStepOff()
+myedo.moveGripper(0)
+
 from PIL import Image, ImageTk  # Correct import for Image and ImageTk
 
 from intro import show_intro
@@ -61,29 +67,29 @@ threshold_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10) #Posizione sli
 
 def mapHand(mp_hands, hand_landmarks):
     try:
-        thumb_cmc = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_CMC]
-        thumb_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_MCP] 
-        thumb_ip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP]
+        #thumb_cmc = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_CMC]
+        #thumb_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_MCP] 
+        #thumb_ip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP]
         thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP] 
 
-        index_finger_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_MCP]
-        index_finger_pip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP]
-        index_finger_dip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_DIP]
+        #index_finger_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_MCP]
+        #index_finger_pip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP]
+        #index_finger_dip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_DIP]
         index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
                 
-        middle_finger_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_MCP]
-        middle_finger_pip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP] 
-        middle_finger_dip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_DIP]
+        #middle_finger_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_MCP]
+        #middle_finger_pip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP] 
+        #middle_finger_dip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_DIP]
         middle_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP] 
 
-        ring_finger_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_MCP]
-        ring_finger_pip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP]
-        ring_finger_dip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_DIP]
+        #ring_finger_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_MCP]
+        #ring_finger_pip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP]
+        #ring_finger_dip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_DIP]
         ring_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP]
 
-        pinky_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_MCP]
-        pinky_pip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP]
-        pinky_dip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_DIP]
+        #pinky_mcp = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_MCP]
+        #pinky_pip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP]
+        #pinky_dip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_DIP]
         pinky_tip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP]
     except Exception as e:
         messagebox.showerror(f"Errore nella mappatura della mano: {e}")
@@ -134,6 +140,8 @@ def CalculateCenter(mp_hands, mp_drawing, frame, hand_landmarks, wrist, index_fi
     palm_center_y = int((wrist.y + index_finger_tip.y + middle_finger_tip.y + ring_finger_tip.y + pinky_tip.y) / 5 * frame.shape[0])
 
     palm_center_text = f"X: {int(palm_center_x)} Y: {int(palm_center_y)}"
+
+    robotX = palm_center_x
 
     #Aggiorna dato
     data.palm_center = (palm_center_x, palm_center_y)
@@ -186,6 +194,11 @@ def update_video_stream():
             #Mostra scritta
             cv2.putText(frame, gesture, (10, 30), cv2.FONT_HERSHEY_PLAIN, 1.5, (0, 255, 0), 3)
 
+    #Mostra output
+            if gesture == "Mano aperta":
+    	        myedo.moveGripper(80)
+            else:
+                myedo.moveGripper(0)
 
     #Converti i frame in modo che possano essere usati da Tkinter
     img = Image.fromarray(frame)  # Converti frame ad immagine
@@ -198,7 +211,6 @@ def update_video_stream():
     #Aggiorna il flusso ogni 10 millisecondi
     root.after(10, update_video_stream)       
 
-    #Mostra output
 
 """
 Avvia subroutine principali

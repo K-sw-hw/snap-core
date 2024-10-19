@@ -1,4 +1,5 @@
 import serial, time
+from pyedo import edo
 
 #Qui vengono memorizzate le variabili globali
 
@@ -6,20 +7,20 @@ import serial, time
 gesture = ""
 distance = 0
 palm_center = (0, 0)
+"""
+#Inizializza robot
+myedo = edo('192.168.12.1')
 
-try:
-    arduino = serial.Serial('COM3', 9600, timeout=1)
-    time.sleep(2)
-except serial.SerialException as e:
-    print(f"Porta seriale non disponibile: {e}")
-    arduino = None
+#myedo.stepByStepOff()
 
-def send_data():
-    if arduino is not None:
-        data_string = f"{gesture}.{distance}.{palm_center[0]}.{palm_center[1]}"
-        
-        try:
-            arduino.write(data_string.encode())
-        except Exception as e:
-            print(f"Errore nella trasmissione dati: {e}")
+if gesture == "Mano aperta":
+	myedo.moveSingleJoint(6, 80)
+	time.sleep(1)
+elif gesture == "Mano chiusa":
+	myedo.moveSingleJoint(6, 10)
+	time.sleep(1)
+else:
+	myedo.moveSingleJoint(6, 0)
+"""	
+
 
